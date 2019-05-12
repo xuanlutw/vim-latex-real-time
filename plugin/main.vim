@@ -11,7 +11,7 @@ let g:loaded_vim_latex_real_time = 1
 fun! s:run_backround()
 
 python3 << EOF
-import time, vim, os
+import time, vim, os, subprocess
 import _thread as thread # Py3
 
 # TODO extract the constant into vim script
