@@ -13,7 +13,6 @@ fun! s:run_backround()
 python3 << EOF
 import time, vim, os
 import _thread as thread # Py3
-from tempfile import TemporaryDirectory
 
 # TODO extract the constant into vim script
 sleep_time = 5
@@ -30,10 +29,9 @@ def autoread_loop():
             tmp_file.write(buff[i] + '\n')
         tmp_file.close()
         # Try compile
-        FNULL = open(os.devnull, 'w')
-        p = subprocess.Popen(["xelatex", "-output-directory", file_path, tex_name], stdout=FNULL, stderr=subprocess.STDOUT)
+        p = subprocess.Popen(["xelatex", "-interaction", "nonstopmode", "-output-directory", file_path, tex_name], stdout=FNULL, stderr=subprocess.STDOUT)
         try:
-            p.wait(1)
+            p.wait(comp_time)
         except:
             p.kill()
 
@@ -51,6 +49,7 @@ os.system("touch "  + ps_name + " > /dev/null 2>&1")
 os.system("ps2pdf " + ps_name + " " + pdf_name + " > /dev/null 2>&1") 
 os.system("touch "  + tex_name)
 os.system("evince " + pdf_name + " &")
+FNULL = open(os.devnull, 'w')
 
 # Startup
 thread.start_new_thread(autoread_loop, ())
