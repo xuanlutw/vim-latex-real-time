@@ -29,25 +29,28 @@ def autoread_loop():
         for i in range(0, len(buff)):
             tmp_file.write(buff[i] + '\n')
         tmp_file.close()
-        print(tmp_name)
         
         # Try compile
         p = subprocess.Popen(["xelatex", "-interaction", "nonstopmode", "-output-directory", tmp_path, tmp_name], stdout=FNULL, stderr=subprocess.STDOUT)
         try:
             p.wait(comp_time)
-            os.system("evince " + tmp_path + "/*.pdf >/dev/null 2>&1 &")
         except:
             p.kill()
 
 # Filenames
 extension = vim.eval("expand('%:e')")
 full_path = vim.eval("expand('%:p')")
-tmp_path = os.popen('mktemp -d').read()
-tmp_path = tmp_path[0:-1]
-tmp_name = tmp_path + '/a.tex'
 
 if (extension == "tex"):
     FNULL = open(os.devnull, 'w')
+    tmp_path = os.popen('mktemp -d').read()
+    tmp_path = tmp_path[0:-1]
+    tmp_name = tmp_path + '/a.tex'
+    tmp_file = open(tmp_name, 'w+')
+    tmp_file.write("\\documentclass[11pt, a4paper]{article}\\begin{document}hello,world\\end{document}")
+    tmp_file.close()
+    os.system("xelatex -interaction=nonstopmode -output-directory=" + tmp_path + " " + tmp_name + " >/dev/null 2>&1")
+    os.system("evince " + tmp_path + "/a.pdf >/dev/null 2>&1 &")
     thread.start_new_thread(autoread_loop, ())
 
 EOF
